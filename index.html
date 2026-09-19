@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Référentiel Urbanisme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">RU</span>
+      <div class="brand-text">
+        <h1>Référentiel Urbanisme</h1>
+        <p>Métropole Européenne de Lille</p>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <button data-tab="zonage" class="active" type="button">Plan de zonage</button>
+      <button data-tab="instructions" type="button">Instructions</button>
+      <button data-tab="rapports" type="button">Rapports</button>
+    </nav>
+    <div class="breadcrumb">
+      <b>Couronne ouest de la MEL</b><br>7 communes (Lille · Capinghem · Englos · Sequedin · Pérenchies · Prémesques · Ennetières-en-Weppes) : démonstration technique
+    </div>
+  </header>
+
+  <main class="workspace" id="view-zonage">
+    <aside class="panel panel-left">
+      <section class="panel-section">
+        <h2>Calques</h2>
+        <label class="layer-row"><input type="checkbox" data-layer="zonage" checked> Zonage PLUi</label>
+        <label class="layer-row"><input type="checkbox" data-layer="prescriptions" checked> Prescriptions &amp; annexes PLU</label>
+        <label class="layer-row"><input type="checkbox" data-layer="parcelles" checked> Cadastre (parcelles)</label>
+        <label class="layer-row"><input type="checkbox" data-layer="batiments"> Bâti existant</label>
+        <label class="layer-row"><input type="checkbox" data-layer="communes" checked> Limites communales</label>
+      </section>
+      <section class="panel-section">
+        <h2>Légende du zonage</h2>
+        <div class="legend-item"><i style="background:var(--zone-u)"></i> U — Zones urbaines</div>
+        <div class="legend-item"><i style="background:var(--zone-au)"></i> AU — À urbaniser</div>
+        <div class="legend-item"><i style="background:var(--zone-a)"></i> A — Agricole</div>
+        <div class="legend-item"><i style="background:var(--zone-n)"></i> N — Naturelle &amp; forestière</div>
+        <p class="legend-note">Sous-secteurs réels du PLUi (UCO, UEP, UE/UX, AUc, AUs, NJ…) regroupés ici par famille de zone au sens du code de l'urbanisme.</p>
+      </section>
+      <section class="panel-section sources">
+        <h2>Sources</h2>
+        <p>Zonage &amp; prescriptions : PLUi MEL en vigueur, via data.gouv.fr (Licence Ouverte 2.0)</p>
+        <p>Parcelles &amp; bâti : Cadastre Etalab / DGFiP</p>
+        <p>Limites communales : MEL / IGN / INSEE</p>
+      </section>
+    </aside>
+
+    <section class="map-area">
+      <div class="map-toolbar">
+        <span class="map-title">Extrait du plan de zonage</span>
+        <button id="btn-new-instruction" type="button">Nouvelle instruction ADS</button>
+      </div>
+      <div class="map-canvas" id="map-canvas">
+        <svg id="map-svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <pattern id="gridPattern" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M20 0H0V20" fill="none" stroke="var(--grid-line)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect class="grid-bg" x="-100000" y="-100000" width="200000" height="200000"></rect>
+          <g id="layer-zonage"></g>
+          <g id="layer-communes"></g>
+          <g id="layer-batiments" style="display:none"></g>
+          <g id="layer-prescriptions"></g>
+          <g id="layer-parcelles"></g>
+          <g id="layer-link"></g>
+        </svg>
+        <div class="zoom-controls">
+          <button type="button" id="btn-zoom-in" title="Zoomer" aria-label="Zoomer">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>
+          </button>
+          <button type="button" id="btn-zoom-out" title="Dézoomer" aria-label="Dézoomer">
+            <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 10h12"/></svg>
+          </button>
+          <button type="button" id="btn-zoom-reset" title="Réinitialiser la vue" aria-label="Réinitialiser la vue">
+            <svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 8.5A5.98 5.98 0 0 0 10 4a6 6 0 1 0 5.65 8"/><path d="M15.8 4.5v4h-4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="cartouche">
+        <span class="north-arrow"><svg viewBox="0 0 14 18" width="10" height="13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="M7 1v16M7 1 2 7M7 1l5 6"/></svg> Nord (orientation indicative)</span>
+        <span class="scale-wrap"><span id="scale-label">Échelle —</span><span class="scale-bar" id="scale-bar"></span></span>
+        <span class="grow">Extrait PLUi de la MEL, document de démonstration technique, non opposable</span>
+      </div>
+    </section>
+
+    <aside class="panel panel-right">
+      <section class="panel-section">
+        <h2>Fiche parcelle</h2>
+        <div id="fiche-parcelle"><p class="empty-state">Sélectionnez une parcelle sur le plan.</p></div>
+      </section>
+      <section class="panel-section">
+        <h2>Pré-instruction automatique</h2>
+        <span class="badge-demo" id="sim-badge">Simulation pédagogique</span>
+        <div id="pre-instruction"><p class="empty-state">Sélectionnez d'abord une parcelle.</p></div>
+      </section>
+    </aside>
+  </main>
+
+  <main class="placeholder-view" id="view-instructions" hidden>
+    <h2>Module Instructions</h2>
+    <p>Historique et suivi des instructions ADS (permis de construire, déclarations préalables…) rattachées aux parcelles du territoire. Ce module n'est pas implémenté dans cette démonstration ; la pré-instruction automatique reste disponible dans l'onglet « Plan de zonage ».</p>
+  </main>
+  <main class="rapports-view" id="view-rapports" hidden>
+    <div class="rapports-header">
+      <h2>Rapport de synthèse</h2>
+      <p>Statistiques calculées en direct sur les données chargées : 7 communes de la couronne ouest de la MEL.</p>
+    </div>
+    <div class="rapports-grid">
+      <section class="report-block">
+        <h3>Vue d'ensemble</h3>
+        <div id="rap-overview"></div>
+      </section>
+      <section class="report-block">
+        <h3>Superficie de zonage par famille</h3>
+        <div id="rap-zonage-chart"></div>
+      </section>
+      <section class="report-block">
+        <h3>Parcelles par commune</h3>
+        <div id="rap-commune-chart"></div>
+      </section>
+      <section class="report-block">
+        <h3>Constructibilité des parcelles</h3>
+        <div id="rap-constructible"></div>
+      </section>
+      <section class="report-block">
+        <h3>Couverture du règlement écrit</h3>
+        <div id="rap-couverture"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
