@@ -1,4 +1,4 @@
-# Référentiel Urbanisme — MEL
+# Référentiel Urbanisme (MEL)
 
 Démonstrateur technique PLU(i) / cadastre / pré-instruction ADS pour la Métropole
 Européenne de Lille (couronne ouest : Lille, Capinghem, Englos, Sequedin,
@@ -8,8 +8,10 @@ Projet personnel réalisé pour illustrer des compétences de géomaticien
 (traitement de données SIG, standards CNIG, réglementation d'urbanisme),
 construit sur des données réelles plutôt que des exemples fictifs.
 
+**Démo en ligne :** (à ajouter après activation de GitHub Pages)
+
 **Ce n'est pas un document officiel.** Les données sont réelles, mais l'outil
-n'a aucune valeur légale (non opposable) — voir la mention en bas de carte.
+n'a aucune valeur légale (non opposable), comme l'indique la mention en bas de carte.
 
 ## Fonctionnalités
 
@@ -22,9 +24,9 @@ n'a aucune valeur légale (non opposable) — voir la mention en bas de carte.
 ## Données et méthode
 
 - **Zonage, cadastre, prescriptions** : PLUi MEL en vigueur et cadastre Etalab/DGFiP, via data.gouv.fr (Licence Ouverte 2.0)
-- **Emprise au sol et recul** : valeurs réelles extraites du règlement écrit du PLUi (Livres II, III et IV, ~1100 pages), chapitre par chapitre selon la zone
-- **Hauteur** : extraite du plan des hauteurs graphique officiel (GeoPDF géoréférencé par commune), décodé par analyse colorimétrique de sa légende (15 catégories) et échantillonnage par parcelle — réel pour 56 % des parcelles ; le reste renvoie honnêtement au plan graphique plutôt que d'afficher une estimation
-- Chaque valeur affichée précise sa source (règlement écrit, plan des hauteurs, ou estimation pédagogique si le chapitre exact n'a pas pu être identifié)
+- **Emprise au sol et recul** : valeurs réelles extraites du règlement écrit du PLUi (Livres II, III et IV, environ 1100 pages), chapitre par chapitre selon la zone. Un repli pédagogique existe dans le code pour une zone qui n'aurait pas de chapitre identifié, mais il n'est déclenché par aucune parcelle des données actuelles.
+- **Hauteur** : extraite du plan des hauteurs graphique officiel (GeoPDF géoréférencé par commune), décodé par analyse colorimétrique de sa légende (15 catégories) et échantillonnage par parcelle. Réel pour 56 % des parcelles ; le reste renvoie honnêtement au plan graphique plutôt que d'afficher une estimation (secteur non géoréférencé de Lille, ou correspondance couleur incertaine)
+- Chaque valeur affichée précise sa source exacte (chapitre du règlement écrit, plan des hauteurs, ou repli pédagogique)
 
 ## Stack technique
 
