@@ -8,7 +8,7 @@ Projet personnel réalisé pour illustrer des compétences de géomaticien
 (traitement de données SIG, standards CNIG, réglementation d'urbanisme),
 construit sur des données réelles plutôt que des exemples fictifs.
 
-**Démo en ligne :** (à ajouter après activation de GitHub Pages)
+**Démo en ligne :** https://jauresmas.github.io/ref_urban/
 
 **Ce n'est pas un document officiel.** Les données sont réelles, mais l'outil
 n'a aucune valeur légale (non opposable), comme l'indique la mention en bas de carte.
