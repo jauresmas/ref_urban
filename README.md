@@ -16,6 +16,7 @@ n'a aucune valeur légale (non opposable), comme l'indique la mention en bas de 
 ## Fonctionnalités
 
 - Carte de zonage PLUi en SVG (pan/zoom), calques cadastre / bâti / prescriptions / limites communales
+- Bâti affiché en extrusion pseudo-3D à hauteur réelle (issue du plan des hauteurs, héritée de la parcelle porteuse), sans exagération d'échelle
 - Fiche parcelle au clic : zone, surface, emprise au sol, recul, hauteur
 - Détection de proximité aux marges de recul graphiques (prescriptions ponctuelles/linéaires)
 - Simulateur de pré-instruction ADS (conformité emprise / hauteur au regard de la zone)
@@ -25,7 +26,7 @@ n'a aucune valeur légale (non opposable), comme l'indique la mention en bas de 
 
 - **Zonage, cadastre, prescriptions** : PLUi MEL en vigueur et cadastre Etalab/DGFiP, via data.gouv.fr (Licence Ouverte 2.0)
 - **Emprise au sol et recul** : valeurs réelles extraites du règlement écrit du PLUi (Livres II, III et IV, environ 1100 pages), chapitre par chapitre selon la zone. Un repli pédagogique existe dans le code pour une zone qui n'aurait pas de chapitre identifié, mais il n'est déclenché par aucune parcelle des données actuelles.
-- **Hauteur** : extraite du plan des hauteurs graphique officiel (GeoPDF géoréférencé par commune), décodé par analyse colorimétrique de sa légende (15 catégories) et échantillonnage par parcelle. Réel pour 56 % des parcelles ; le reste renvoie honnêtement au plan graphique plutôt que d'afficher une estimation (secteur non géoréférencé de Lille, ou correspondance couleur incertaine)
+- **Hauteur** : extraite du plan des hauteurs graphique officiel (GeoPDF géoréférencé par commune), décodé par analyse colorimétrique de sa légende (15 catégories) et échantillonnage par parcelle. Réel pour 56 % des parcelles ; le reste renvoie honnêtement au plan graphique plutôt que d'afficher une estimation (secteur non géoréférencé de Lille, ou correspondance couleur incertaine). Les bâtiments héritent de la hauteur réelle de leur parcelle porteuse quand elle est connue (54 % des bâtiments) ; sinon une hauteur par défaut leur est affectée, visuellement distincte (opacité réduite)
 - Chaque valeur affichée précise sa source exacte (chapitre du règlement écrit, plan des hauteurs, ou repli pédagogique)
 
 ## Stack technique

@@ -29,6 +29,30 @@
   var VB_W = (bbox[2]-bbox[0]) * M_PER_DEG_LAT * COS_REF;
   var VB_H = (bbox[3]-bbox[1]) * M_PER_DEG_LAT;
 
+  // ---- extrusion pseudo-3D des bâtiments ----
+  // Décalage "toit" en unités carte (mètres, à l'échelle réelle : pas d'exagération
+  // de hauteur). Direction fixe façon vue oblique (soleil/caméra en haut à gauche).
+  var BATI_DEFAULT_H = 8; // hauteur par défaut (m) si aucune donnée réelle du plan des hauteurs
+  function batiOffset(hMeters){
+    return [hMeters*0.35, -hMeters*0.9];
+  }
+  function buildingExtrusion(ring, hMeters){
+    var pts = ring.map(function(p){ return project(p[0],p[1]); });
+    var off = batiOffset(hMeters);
+    var wallsD = '';
+    for (var i=0;i<pts.length-1;i++){
+      var a = pts[i], b = pts[i+1];
+      var a2 = [a[0]+off[0], a[1]+off[1]], b2 = [b[0]+off[0], b[1]+off[1]];
+      wallsD += 'M'+a[0].toFixed(1)+','+a[1].toFixed(1)+
+        'L'+b[0].toFixed(1)+','+b[1].toFixed(1)+
+        'L'+b2[0].toFixed(1)+','+b2[1].toFixed(1)+
+        'L'+a2[0].toFixed(1)+','+a2[1].toFixed(1)+'Z ';
+    }
+    var roofD = 'M'+pts.map(function(p){ return (p[0]+off[0]).toFixed(1)+','+(p[1]+off[1]).toFixed(1); }).join('L')+'Z';
+    var maxY = Math.max.apply(null, pts.map(function(p){ return p[1]; }));
+    return {wallsD:wallsD, roofD:roofD, maxY:maxY};
+  }
+
   function ringToPath(ring){
     var pts = ring.map(function(p){ return project(p[0],p[1]); });
     return 'M' + pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join('L') + 'Z';
@@ -220,14 +244,35 @@
   });
 
   // ---- bâti existant : rendu différé (au premier affichage) pour alléger le chargement initial ----
+  // Extrusion pseudo-3D à hauteur réelle quand connue (issue du plan des hauteurs,
+  // héritée de la parcelle porteuse), sinon hauteur par défaut visuellement distincte
+  // (bâtiments "estimés" moins opaques) plutôt que de prétendre une précision inconnue.
   var gBati = document.getElementById('layer-batiments');
   var batiRendered = false;
+  function outerRings(geom){
+    if (geom.type === 'Polygon') return [geom.coordinates[0]];
+    if (geom.type === 'MultiPolygon') return geom.coordinates.map(function(poly){ return poly[0]; });
+    return [];
+  }
   function renderBatimentsOnce(){
     if (batiRendered) return;
     batiRendered = true;
-    var frag = document.createDocumentFragment();
+    var items = [];
     APP_DATA.batiments.forEach(function(b){
-      frag.appendChild(el('path', {d: geomToPath(b.geom), 'class':'bati-poly'}));
+      var hp = b.hauteurPlan;
+      var real = hp && hp.a != null ? hp.a : null;
+      var h = real != null ? real : BATI_DEFAULT_H;
+      outerRings(b.geom).forEach(function(ring){
+        var ext = buildingExtrusion(ring, h);
+        items.push({ext:ext, real: real!=null});
+      });
+    });
+    items.sort(function(a,b){ return a.ext.maxY - b.ext.maxY; }); // peintre : plus loin (haut de carte) d'abord
+    var frag = document.createDocumentFragment();
+    items.forEach(function(it){
+      var cls = it.real ? 'bati-3d-real' : 'bati-3d-estim';
+      frag.appendChild(el('path', {d: it.ext.wallsD, 'class':'bati-3d-wall '+cls}));
+      frag.appendChild(el('path', {d: it.ext.roofD, 'class':'bati-3d-roof '+cls}));
     });
     gBati.appendChild(frag);
   }

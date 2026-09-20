@@ -147,14 +147,21 @@ button{font-family:"Bricolage Grotesque",sans-serif;cursor:pointer;}
 }
 .zoom-controls button:last-child{font-size:13px;}
 .zoom-controls button:hover{background:var(--shell);}
-.zone-poly,.commune-line,.bati-poly,.parcelle-poly,.presc-line{vector-effect:non-scaling-stroke;}
+.zone-poly,.commune-line,.bati-3d-wall,.bati-3d-roof,.parcelle-poly,.presc-line{vector-effect:non-scaling-stroke;}
 .zone-poly{stroke:#fff;stroke-width:1;fill-opacity:.85;cursor:default;}
 .zone-poly.type-U{fill:var(--zone-u);}
 .zone-poly.type-AUc,.zone-poly.type-AUs{fill:var(--zone-au);}
 .zone-poly.type-A{fill:var(--zone-a);}
 .zone-poly.type-N{fill:var(--zone-n);}
 .commune-line{fill:none;stroke:var(--ink-faint);stroke-width:2.4;stroke-dasharray:1 5;stroke-linecap:round;}
-.bati-poly{fill:#8A8D94;fill-opacity:.55;stroke:#5B5F68;stroke-width:.6;}
+/* Bâti en extrusion pseudo-3D : hauteur réelle (plan des hauteurs, teinte accent)
+   vs hauteur par défaut estimée (gris neutre, plus discret). */
+.bati-3d-wall{stroke:none;}
+.bati-3d-wall.bati-3d-real{fill:var(--accent-strong);fill-opacity:.75;}
+.bati-3d-wall.bati-3d-estim{fill:#5B5F68;fill-opacity:.22;}
+.bati-3d-roof{stroke-width:.5;}
+.bati-3d-roof.bati-3d-real{fill:var(--accent);fill-opacity:.9;stroke:var(--accent-strong);}
+.bati-3d-roof.bati-3d-estim{fill:#8A8D94;fill-opacity:.4;stroke:#3E4147;}
 .parcelle-poly{fill:#fff;fill-opacity:.02;stroke:var(--ink);stroke-width:.8;stroke-opacity:.4;}
 .parcelle-poly:hover{fill-opacity:.18;fill:var(--accent);cursor:pointer;}
 .parcelle-poly.selected{fill:var(--accent);fill-opacity:.28;stroke:var(--accent);stroke-width:2.4;}
