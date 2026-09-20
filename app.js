@@ -1,6 +1,16 @@
 (function(){
   "use strict";
 
+  // Échappement HTML pour tout texte injecté via innerHTML et provenant de
+  // données externes (cadastre, PLUi) plutôt que codé en dur dans l'appli :
+  // ces données sont des sources ouvertes officielles, mais rien ne garantit
+  // qu'un champ texte ne contienne jamais de caractères spéciaux.
+  function esc(s){
+    return String(s==null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   var COMMUNE_NAMES = {'59128':'Capinghem','59195':'Englos','59196':'Ennetières-en-Weppes','59350':'Lille','59457':'Pérenchies','59470':'Prémesques','59566':'Sequedin'};
 
   var bbox = APP_DATA.meta.bbox; // [minLon,minLat,maxLon,maxLat]
@@ -387,16 +397,16 @@
     var hp = pc.hauteurPlan || null;
     var hpNumeric = hp && hp.a!=null ? hp.a : null;
 
-    var refHtml = '<div class="ref-line">'+communeNom+' · '+pc.section+' '+pc.numero+'</div>';
+    var refHtml = '<div class="ref-line">'+esc(communeNom)+' · '+esc(pc.section)+' '+esc(pc.numero)+'</div>';
     var zoneHtml = zone
-      ? '<div class="zone-line">Zone '+zone.libelle+' : '+(zone.libelong||'')+'</div>'
+      ? '<div class="zone-line">Zone '+esc(zone.libelle)+' : '+esc(zone.libelong||'')+'</div>'
       : '<div class="zone-line">Zone non déterminée</div>';
 
     var splitHtml = '';
     if (pc.zoneSplit){
       var parts = pc.zoneSplit.map(function(s){
         var z = APP_DATA.zonage[s[0]];
-        return (z ? z.libelle : '?') + ' (' + Math.round(s[1]*100) + '%)';
+        return esc(z ? z.libelle : '?') + ' (' + Math.round(s[1]*100) + '%)';
       });
       splitHtml = '<div class="zone-split-note"><span class="label">Parcelle à cheval sur plusieurs zones</span>'+parts.join(' · ')+
         '. La zone dominante ('+Math.round(pc.zoneSplit[0][1]*100)+'% de la surface) est retenue ci-dessous ; le cadastre et le zonage sont deux couches indépendantes dont les limites ne coïncident pas toujours.</div>';
@@ -428,7 +438,7 @@
       }
       if (info.reculLine){
         attrs += '<div class="zone-split-note"><span class="label">Marge de recul graphique à proximité</span>'+
-          info.reculLine.libelle+' (à '+Math.round(info.reculLine.dist)+' m du centre de la parcelle) : cette prescription, inscrite au plan, prévaut sur la règle générale de zone ci-dessus si elle s\'applique à cette parcelle. Sa valeur exacte en mètres n\'est pas numérisée dans les données ouvertes ; il faut la vérifier sur le plan de zonage officiel.</div>';
+          esc(info.reculLine.libelle)+' (à '+Math.round(info.reculLine.dist)+' m du centre de la parcelle) : cette prescription, inscrite au plan, prévaut sur la règle générale de zone ci-dessus si elle s\'applique à cette parcelle. Sa valeur exacte en mètres n\'est pas numérisée dans les données ouvertes ; il faut la vérifier sur le plan de zonage officiel.</div>';
       }
       footnote = reg.real
         ? '<p class="legend-note">Emprise et recul : valeurs réelles extraites du règlement écrit du PLUi (source : '+reg.source+'). '+hauteurNote+'</p>'
@@ -629,7 +639,7 @@
     var maxCount = Math.max.apply(null, communeRows.map(function(r){ return r.count; }));
     var communeHtml = communeRows.map(function(r){
       var w = maxCount>0 ? (r.count/maxCount*100) : 0;
-      return '<div class="bar-row"><span class="bar-label">'+r.nom+'</span>'+
+      return '<div class="bar-row"><span class="bar-label">'+esc(r.nom)+'</span>'+
         '<span class="bar-track"><span class="bar-fill" style="width:'+w.toFixed(1)+'%;background:var(--ink)"></span></span>'+
         '<span class="bar-val">'+r.count.toLocaleString('fr-FR')+'</span></div>';
     }).join('');
